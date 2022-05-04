@@ -1,4 +1,5 @@
-import os
+#coding: utf-8
+from operator import ge
 import commands
 import math
 
@@ -9,6 +10,7 @@ def get_files_names():
 #return all author devolopers in repository 
 def get_authors_name():
     return commands.getoutput("git log --format='%aN' | sort -u").split('\n')
+authors_name = get_authors_name()
 
 # return log commits by author
 def calculate_commit_by_author(author):
@@ -35,7 +37,7 @@ def creating_dictonary_commits_by_author():
 
 
 def calculate_change_all_authors(files_by_commit_by_author):
-    for author in get_authors_name():
+    for author in authors_name:
         #Recupera a quantidade de commits por author
         logs = calculate_commit_by_author(author)
         if len(logs) > 1 :
@@ -43,7 +45,6 @@ def calculate_change_all_authors(files_by_commit_by_author):
                 log_atual = log.strip().split(" ")
                 if len(log_atual) > 1:
                     if log_atual[1] in files_by_commit_by_author.keys():
-                        item = files_by_commit_by_author.get(log_atual[1])
                         files_by_commit_by_author[log_atual[1]].update({author : int(log_atual[0])})
 
 def calculate_DL_and_AC_other_files(files, author, commits_by_authors, doaa_author):
@@ -54,9 +55,9 @@ def calculate_DL_and_AC_other_files(files, author, commits_by_authors, doaa_auth
            dl  = calculate_DL(author, file)
            doaa_author.update({file: [0, dl, ac]})
             
-def calculate_AC(author, chances):
-    if chances.get(author) != None:
-        return reduce(lambda x, value:x + value, chances.itervalues(), 0) - chances.get(author)
+def calculate_AC(author, changes):
+    if changes.get(author) != None:
+        return reduce(lambda x, value:x + value, changes.itervalues(), 0) - changes.get(author)
     else:
         return 0
 
@@ -101,7 +102,7 @@ doa = {}
 def creating_autority_deegree(doa):
     commits_by_authors = creating_dictonary_commits_by_author()
     calculate_change_all_authors(commits_by_authors)
-    for author in  get_authors_name():
+    for author in authors_name:
         doa.update({author : calculate_DOAA(author, commits_by_authors)})
 
 creating_autority_deegree(doa)
@@ -112,7 +113,6 @@ for k,v in doa.iteritems():
     for f, doaa in v.iteritems():
          doa_calculado.update({f : calculate_doa(doaa[0],doaa[1],doaa[2]) })
     dao_files.update({k : doa_calculado })
-
 
 
 
